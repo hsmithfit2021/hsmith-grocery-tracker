@@ -43,51 +43,56 @@ const server = http.createServer((req, res) => {
 });
 
 
-function handleGet(req, res) {
-    let listItems = service.get();
-    res.statusCode = 200; // OK
-    res.end(JSON.stringify(listItems));
+async function handleGet(req, res) {
+    const id = req.url.split("/")[1];
+    if(req.url.split("/").length === 1) {
+
+    }
+    else {
+        const item = await service.get(id);
+        res.statusCode = 200; // OK
+        res.end(JSON.stringify(items));
+    }
 }
 
-function handlePost(req, res) {
+async function handlePost(req, res) {
     let body = "";
 
     req.on('data', (chunk) => {
         body += chunk;
     });
-    req.on('end', () => {
+    req.on('end', async () => {
         let listItem = JSON.parse(body);
-        service.add(listItem);
+        const item = await service.add(listItem);
 
         res.statusCode = 201; // CREATED
-        res.end(JSON.stringify(listItem));
+        res.end(JSON.stringify(item));
     });
 }
-function handlePut(req, res) {
+async function handlePut(req, res) {
     let body = "";
 
     req.on('data', (chunk) => {
         body += chunk;
     });
-    req.on('end', () => {
+    req.on('end', async () => {
         let listItem = JSON.parse(body);
-        service.update(listItem);
+        const item = await service.update(listItem);
 
         res.statusCode = 200; // OK
-        res.end(JSON.stringify(listItem));
+        res.end(JSON.stringify(item));
     });
 }
 
-function handleDelete(req, res) {
+async function handleDelete(req, res) {
     let body = "";
-    let listItems = repository.getDatabase();
 
     req.on('data', (chunk) => {
         body += chunk;
     });
-    req.on('end', () => {
+    req.on('end', async () => {
         let listItem = JSON.parse(body);
-        service.delete(listItem);
+        const item = await service.deleteFromDatabase(listItem);
 
         res.statusCode = 204; // NO CONTENT
         res.end();
